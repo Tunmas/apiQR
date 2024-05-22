@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Administrador</title>
+    <script src="https://unpkg.com/axios@latest/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/interfazAPI.css">
+
+    <title>Home</title>
+</head>
+<body>
+    <h1 class="titulo">Tablero de usuario</h1>
+  
+    <h2 class="titulo">Generar Código QR</h2>
+    <div class="contenedor-input">
+        <input type="text" id="textoQR" placeholder="Ingresa el texto para el código QR">
+        <button onclick="generarQR()">Generar QR</button>
+    </div>
+    
+    <div class="contenedor-imagen">
+        <img id="imagenQR" src="" alt="Código QR generado">
+    </div>
+
+    <script>
+        function generarQR() {
+            const token = localStorage.getItem('token');
+
+            const texto = document.getElementById('textoQR').value;
+
+            axios.post('http://localhost:3005/generarQR', { texto }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                const imagenQR = document.getElementById('imagenQR');
+                imagenQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${texto}`;
+                imagenQR.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al generar el código QR');
+            });
+        }
+    </script>
+</body>
+</html>

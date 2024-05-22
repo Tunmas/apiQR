@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuarios</title>
+    <style>
+        table {
+            width: 100%; 
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: center; 
+            border: 1px solid #000; 
+            padding: 8px; 
+        }
+
+        th {
+            background-color: #f2f2f2; 
+        }
+
+        .btn {
+            padding: 5px 10px;
+            background-color: #007bff; 
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <table id="tabla-usuarios" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+    
+    <script>
+        async function lista() {
+            try {
+                const response  = await fetch('http://localhost:3005/usuarios_qr');
+                const usuarios = await response.json();
+                let content = '';
+
+                usuarios.forEach(usuario => {
+                    let botonRol = '';
+                    let botonEstado = '';
+
+                    // Verificar el estado del usuario
+                    if (usuario.habilitado_id === 1) {
+                        botonEstado = `<button class="btn" onclick="cambiarEstado(${usuario.usuario_id}, 0)">Habilitado</button>`;
+                    } else {
+                        botonEstado = `<button class="btn" onclick="cambiarEstado(${usuario.usuario_id}, 1)">Deshabilitado</button>`;
+                    }
+
+                    // Verificar el rol del usuario
+                    if (usuario.tipo_usuario_id === 1) {
+                        botonRol = '<button class="btn">Admin</button>';
+                    } else {
+                        botonRol = '<button class="btn">Normal</button>';
+                    }
+
+                    content += `<tr>
+                                    <td>${usuario.usuario_id}</td>
+                                    <td>${usuario.usuario_name}</td>
+                                    <td>${botonRol}</td>
+                                    <td>${botonEstado}</td>                                    
+                                </tr>`;
+                });
+
+                document.getElementById('tableBody').innerHTML = content;
+            } catch (error) {
+                console.error('Error al obtener los usuarios:', error);
+                alert('Error al obtener los usuarios');
+            }
+        }
+
+        async function cambiarEstado(usuarioId, nuevoEstado) {
+            try {
+                // Realizar una solicitud POST para actualizar el estado del usuario en la base de datos
+                const response = await fetch(`http://localhost:3005/usuarios_qr/${usuarioId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ habilitado_id: nuevoEstado })
+                });
+
+                // Verificar si la solicitud fue exitosa
+                if (response.ok) {
+                    // Si la solicitud fue exitosa, actualizar la lista de usuarios
+                    lista();
+                } else {
+                    // Si hubo un error, mostrar un mensaje de error
+                    console.error('Error al cambiar el estado del usuario:', response.statusText);
+                    alert('Error al cambiar el estado del usuario');
+                }
+            } catch (error) {
+                console.error('Error al cambiar el estado del usuario:', error);
+                alert('Error al cambiar el estado del usuario');
+            }
+        }
+
+        lista();
+    </script>
+    </body>
+</html>

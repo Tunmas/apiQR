@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Administrador</title>
+    <script src="https://unpkg.com/axios@latest/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- <link rel="stylesheet" href="/css/interfazAPI.css">
+    <link rel="stylesheet" href="/css/Tabla.css"> -->
+</head>
+<body>
+    <h1>Tablero de Administrador</h1>
+
+    <h2>Generar Código QR</h2>
+    <div class="contenedor-input">
+        <input type="text" id="textoQR" placeholder="Ingresa el texto para el código QR">
+        <button onclick="generarQR()">Generar QR</button>
+    </div>
+    <div class="contenedor-imagen">
+        <img id="imagenQR" src="" alt="Código QR generado" style="display: none;">
+    </div>
+    <br><br>
+    <div class="contenedor-tabla">   
+        <button id="administrarUsuarios">Administrar Usuarios</button>
+    </div>
+    <div id="contenido"></div>
+    
+    <script>
+        document.getElementById('administrarUsuarios').addEventListener('click', cargarUsuarios);
+
+        function cargarUsuarios() {
+            const token = localStorage.getItem('token');
+
+            axios.get('http://localhost:3002/obtenerusuarios', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                const contenido = document.getElementById('contenido');
+                let tabla = '<table id="tablaUsuarios">';
+                tabla += '<thead><tr><th>ID</th><th>Nombre</th><th>Habilitado</th><th>Tipo de Usuario</th><th>Fecha de Creación</th><th>Acciones</th></tr></thead>';
+                tabla += '<tbody>';
+                response.data.forEach(usuario => {
+                    let estadoUsu = 'No';
+                    if (usuario.estado == true) {
+                        estadoUsu = 'Si';
+                    }
+                    tabla += `<tr><td>${usuario.usuario_id}</td><td>${usuario.usuario_name}</td><td>${estadoUsu}</td><td>${usuario.tipo}</td><td>${usuario.created_at}</td>`;
+                    tabla += `<td><button onclick="habilitarSuspender(${usuario.usuario_id})">Habilitar / Suspender</button><button onclick="cambiarRol(${usuario.usuario_id})">Cambiar rol</button></td></tr>`;
+                });
+                tabla += '</tbody></table>';
+                contenido.innerHTML = tabla;
+
+                // Inicializar DataTables
+                $('#tablaUsuarios').DataTable();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function habilitarSuspender(id) {
+            const token = localStorage.getItem('token');
+
+            axios.post('http://localhost:3003/modificarEstado', { id }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                alert('Estado modificado exitosamente');
+                cargarUsuarios(); 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al modificar el Estado');
+            });
+        }
+
+        function cambiarRol(id) {
+            const token = localStorage.getItem('token');
+
+            axios.post('http://localhost:3004/modificarRol', { id }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                alert('Rol modificado exitosamente');
+                cargarUsuarios(); 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al modificar el rol');
+            });
+        }
+
+        function generarQR() {
+            const token = localStorage.getItem('token');
+
+            const texto = document.getElementById('textoQR').value;
+
+            axios.post('http://localhost:3005/generarQR', { texto }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => {
+                const imagenQR = document.getElementById('imagenQR');
+                imagenQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${texto}`;
+                imagenQR.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al generar el código QR');
+            });
+        }
+    </script>
+</body>
+</html>

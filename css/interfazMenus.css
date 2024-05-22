@@ -1,0 +1,40 @@
+.Menu {
+    width: 300px; 
+    margin: 0 auto; 
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 5%;
+    margin-top: 1%;
+}
+
+.Menu form {
+    margin-top: 20px;
+}
+
+.Menu a {
+    display: block; 
+    margin-top: 20px; 
+    text-align: center; 
+}
+
+.formulario {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+}
+
+.part-usuario,
+.part-contra-boton {
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    margin: 5px 0;
+}
+
+.part-boton {
+    margin-top: 5px; 
+    width: fit-content; 
+}
+.direccion {
+    margin-bottom: 20px;
+}

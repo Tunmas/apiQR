@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Usuario</title>
+    <script src="https://unpkg.com/axios@latest/dist/axios.min.js"></script>
+
+    <link rel="stylesheet" href="/css/interfazMenus.css">
+    <link rel="stylesheet" href="/css/interfazAPI.css">
+
+    <title>Crear Usuario</title>
+</head>
+
+<body>
+    <div class="Menu">
+    <h1>Crear usuario</h1>
+    
+    <form id="crearUsuarioForm" onsubmit="crearUsuario(event)">
+        <div class="part-usuario">
+            <label for="usuario">Usuario: </label>
+            <input type="text" id="usuario" name="usuario" required>
+        </div>
+        <div class="part-contra-boton">
+            <div class="part-contra">
+                <label for="contrasena">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" required>
+            </div>
+            <div class="part-boton">
+                <button type="submit">Crear usuario</button>
+            </div>
+        </div>
+    </form>
+
+    <a class="direccion" href="./index.html">VOLVER</a>
+    </div>
+
+    <script>
+        async function crearUsuario(event) {
+            event.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            try {
+                const response = await axios.post(`http://localhost:3000/crearusuario`, { usuario, contrasena });
+
+                if (response.status === 200) {
+                    alert('Usuario creado exitosamente');
+                } else {
+                    alert('Error creando el usuario');
+                }
+            } catch (error) {
+                alert('Error al crear el usuario');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

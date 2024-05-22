@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <link rel="stylesheet" href="/css/interfazMenus.css">
+    <link rel="stylesheet" href="/css/interfazAPI.css">
+
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="Menu">
+    <h1>Iniciar sesión</h1>
+
+    <form action="#" onsubmit="iniciarSesion(event)" class="formulario">
+        <div class="part-usuario">
+            <label for="usuario">Usuario: </label>
+            <input type="text" id="usuario" name="usuario" required>
+        </div>
+        <div class="part-contra-boton">
+            <div class="part-contra">
+                <label for="contrasena">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" required>
+            </div>
+            <div class="part-boton">
+                <button type="submit">Iniciar sesión</button>
+            </div>
+        </div>
+    </form>
+    
+    
+
+
+    <a class="direccion" href="./crearusuario.html">CREAR USUARIO</a>
+    </div>
+
+    <script>
+        async function iniciarSesion(event) {
+            event.preventDefault();
+
+            const usuario = document.getElementById('usuario').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            console.log('Iniciando sesión con usuario:', usuario);
+
+            try {
+                const response = await axios.post('http://localhost:3001/iniciarsesion', { usuario, contrasena });
+
+                console.log('Respuesta del servidor:', response);
+
+                if (response.status === 200) {
+                    // Guardar el token en el almacenamiento local
+                    localStorage.setItem('token', response.data.token);
+
+                    // Redirigir al usuario en función de su tipo de usuario
+                    if (response.data.userType === 1) {
+                        window.location.href = './homeAdmin.html';
+                    } else {
+                        window.location.href = './homeUser.html';
+                    }
+                } else {
+                    alert('Error iniciando sesión');
+                }
+            } catch (error) {
+                console.error('Error al iniciar sesión:', error);
+                alert('Error al iniciar sesión');
+            }
+        }
+    </script>
+
+
+</body>
+
+</html>
